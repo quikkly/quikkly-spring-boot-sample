@@ -29,6 +29,7 @@
 			<id>quikkly-repo</id>
 			<name>nexus</name>
 			<url>http://developers.quikkly.io/nexus/repository/maven-releases/</url>
+			<releases><enabled>true</enabled></releases>
 		</repository>
 	</repositories>
 
@@ -42,7 +43,7 @@
 		<dependency>
 			<groupId>net.quikkly.core</groupId>
 			<artifactId>quikklycore-lib</artifactId>
-			<version>3.0.4</version>
+			<version>3.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -78,6 +79,77 @@
 						-Djava.library.path=./libs/x86_64
 					</jvmArguments>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/docker</directory>
+									<filtering>true</filtering>
+								</resource>
+								<resource>
+									<directory>libs</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.13</version>
+				<configuration>
+					<baseImage>java:8</baseImage>
+					<env>
+						<JAVA_OPTS>-Xms128m -Xmx256m -Djava.library.path=/data/libs/x86_64</JAVA_OPTS>
+					</env>
+					<entryPoint>["bash", "/data/start.sh", "/data/${project.build.finalName}.jar"]</entryPoint>
+					<resources>
+						<resource>
+							<targetPath>/data</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>start.sh</include>
+						</resource>
+						<resource>
+							<targetPath>/data</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+						<resource>
+							<targetPath>/data/libs/x86_64</targetPath>
+							<directory>${project.build.directory}/x86_64</directory>
+							<include>*.*</include>
+						</resource>
+					</resources>
+					<serverId>art4lab0</serverId>
+					<imageName>${project.artifactId}:${project.version}</imageName>
+					<imageTags>
+						<imageTag>${project.version}</imageTag>
+						<imageTag>latest</imageTag>
+					</imageTags>
+				</configuration>
+				<executions>
+					<execution>
+						<id>package</id>
+						<phase>package</phase>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

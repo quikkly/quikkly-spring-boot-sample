@@ -2,14 +2,13 @@ package net.quikkly.web;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import net.quikkly.core.Pipeline;
 import net.quikkly.core.QuikklyCore;
 import net.quikkly.core.Skin;
-import org.omg.CORBA.NameValuePair;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.json.JacksonJsonParser;
-import org.springframework.boot.json.JsonJsonParser;
 import org.springframework.boot.json.JsonParser;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +34,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @SpringBootApplication
 @EnableCaching
+@Slf4j
 public class QuikklyWebSampleApplication {
 
 	public static void main(String[] args) {
@@ -44,7 +43,7 @@ public class QuikklyWebSampleApplication {
 
 	@Bean
 	String bluePrint() throws IOException {
-		return StreamUtils.copyToString(this.getClass().getResourceAsStream("/default_blueprint.json"), Charset.forName("UTF-8"));
+		return StreamUtils.copyToString(this.getClass().getResourceAsStream("/blueprint_default.json"), Charset.forName("UTF-8"));
 	}
 
 	@Bean
