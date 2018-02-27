@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.quikkly.web</groupId>
-	<artifactId>quikkly-web-sample</artifactId>
+	<artifactId>quikkly-spring-boot-sample</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
