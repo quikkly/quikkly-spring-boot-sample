@@ -1,4 +1,4 @@
-# quikkly-web-sample
+# quikkly-spring-boot-sample
 A spring boot example that uses the quikklycore-lib and native libraries.
 
 ## what to do next....
