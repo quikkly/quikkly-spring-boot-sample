@@ -41,6 +41,29 @@
                     <img id="svg" alt="Loading..." style="display: none"></img>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-12">
+                    <hr/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <h1>Tag Scanner</h1>
+                    <p>A sample program to demonstrate how to scan an image file</p>
+                    <hr/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <form id="frmUpload" enctype="multipart/form-data">
+                        <input class="btn btn-default" id="file" name="file" type="file" />
+                        <input class="btn btn-primary" id="upload" type="button" value="Upload" />
+                    </form>
+                </div>
+                <div class="col-6 centered">
+                    <h1>Value: <span id="scannedTag"></span></h1>
+                </div>
+            </div>
         </div>
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -51,6 +74,8 @@
             $(document).ready(function() {
                 setupTemplates();
                 addFormHandler();
+                addFileHandler();
+                addUploadHandler();
             });
 
             function setupTemplates() {
@@ -66,6 +91,37 @@
                 $('#frmGenerate').submit(function() {
                     $('#svg').attr('src', 'code/' + $('#tagNumber').val() + '?template=' + $('#templateSelect').val()).css('display', '');
                     return false;
+                });
+            }
+
+            function addFileHandler() {
+                $('#file').on('change', function() {
+                    var file = this.files[0];
+                    if (file.size > 1024 * 1024) {
+                        alert('max upload size is 1mb')
+                    }
+                });
+            }
+
+            function addUploadHandler() {
+                $('#upload').on('click', function() {
+                    $.ajax({
+                        // Your server script to process the upload
+                        url: '/scan',
+                        type: 'POST',
+
+                        // Form data
+                        data: new FormData($('#frmUpload')[0]),
+
+                        // Tell jQuery not to process data or worry about content-type
+                        // You *must* include these options!
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+
+                    }).then(function(response) {
+                        $('#scannedTag').text(response);
+                    });
                 });
             }
         </script>

@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.quikkly.core.Pipeline;
 import net.quikkly.core.QuikklyCore;
+import net.quikkly.core.ScanResult;
 import net.quikkly.core.Skin;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,8 +21,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -65,6 +72,7 @@ class KeyValue {
 }
 
 @Controller
+@Slf4j
 class QuikklyController {
 
 	private final Pipeline pipeline;
@@ -86,6 +94,23 @@ class QuikklyController {
 	public ResponseEntity<List<KeyValue>> getTemplates() {
 		return ok(service.getTemplates());
 	}
+
+	@PostMapping("/scan")
+	public ResponseEntity<String> scanFile(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) throws IOException {
+
+		System.out.println(file.getContentType());
+		BufferedImage image = ImageIO.read(file.getInputStream());
+		byte[] buffer = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+		try {
+			ScanResult result = pipeline.scanFrame(buffer, 2, image.getWidth(), image.getHeight(), image.getWidth() * image.getColorModel().getNumComponents());
+			return ok(String.valueOf(result.tags[0].dataLong));
+		}
+		catch(Exception e) {
+			log.error(e.getMessage());
+		}
+		return ok("N/A");
+	}
+
 
 }
 
